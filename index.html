@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>Idle Dungeon Runner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script src="chs.js"></script>
+<script src="core.js"></script>
+    <!-- Intro Screen -->
+    <div class="intro-screen" id="intro-screen">
+        <div class="intro-content">
+            <div class="intro-logo">
+                <div class="logo-icon">
+                    <div class="logo-sword">⚔️</div>
+                    <div class="logo-skull">💀</div>
+                    <div class="logo-gem">💎</div>
+                </div>
+                <h1 class="logo-title">
+                    <span class="logo-line1">IDLE</span>
+                    <span class="logo-line2">DUNGEON</span>
+                    <span class="logo-line3">RUNNER</span>
+                </h1>
+                <div class="logo-subtitle">Endless Adventure Awaits</div>
+            </div>
+
+            <div class="intro-settings">
+                <h3>Settings</h3>
+                <div class="intro-setting">
+                    <span>Music Volume</span>
+                    <input type="range" id="intro-music" min="0" max="100" value="50">
+                    <span class="volume-value" id="intro-music-val">50%</span>
+                </div>
+                <div class="intro-setting">
+                    <span>Sound Effects</span>
+                    <input type="range" id="intro-sfx" min="0" max="100" value="50">
+                    <span class="volume-value" id="intro-sfx-val">50%</span>
+                </div>
+                <div class="intro-setting">
+                    <label>
+                        <input type="checkbox" id="intro-particles" checked>
+                        <span>Show Particles</span>
+                    </label>
+                </div>
+                <div class="intro-setting">
+                    <label>
+                        <input type="checkbox" id="intro-damage-numbers" checked>
+                        <span>Show Damage Numbers</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="intro-buttons">
+                <button class="intro-btn primary" id="intro-continue" style="display:none;">
+                    <span class="btn-icon">▶️</span>
+                    <span class="btn-text">Continue</span>
+                    <span class="btn-subtitle" id="continue-info"></span>
+                </button>
+                <button class="intro-btn" id="intro-new-game">
+                    <span class="btn-icon">🎮</span>
+                    <span class="btn-text">New Game</span>
+                </button>
+            </div>
+
+            <div class="intro-footer">
+                <span class="version">v1.0.0</span>
+                <span class="credits">Made by ZombieCoco 🧟</span>
+            </div>
+        </div>
+
+        <div class="intro-particles" id="intro-particles"></div>
+    </div>
+
+    <div class="game-container" id="game-container" style="display:none;">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="game-title">Idle Dungeon Runner</div>
+            <div class="header-stats">
+                <div class="stat-box">
+                    <span class="stat-label">Souls</span>
+                    <span class="stat-value soul" id="soul-points">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Floor</span>
+                    <span class="stat-value" id="current-floor">1</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Level</span>
+                    <span class="stat-value" id="player-level">1</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Best</span>
+                    <span class="stat-value" id="best-floor">0</span>
+                </div>
+                <div class="stat-box prestige-box">
+                    <span class="stat-label">Prestige</span>
+                    <span class="stat-value prestige" id="prestige-level">0</span>
+                </div>
+            </div>
+            <div class="speed-controls">
+                <button class="speed-btn active" data-speed="1">1x</button>
+                <button class="speed-btn" data-speed="2">2x</button>
+                <button class="speed-btn" data-speed="5">5x</button>
+            </div>
+            <div class="menu-toggles">
+                <button class="menu-toggle-btn" data-menu="stats">Stats</button>
+                <button class="menu-toggle-btn" data-menu="skills">Skills</button>
+                <button class="menu-toggle-btn" data-menu="equipment">Equip</button>
+                <button class="menu-toggle-btn" data-menu="upgrades">Shop</button>
+                <button class="menu-toggle-btn" data-menu="achievements">Achieve</button>
+                <button class="menu-toggle-btn" data-menu="settings">Settings</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel - Stats -->
+            <div class="sliding-panel left-panel" id="stats-panel">
+                <div class="panel-header">
+                    <h2>Hero Stats</h2>
+                    <button class="close-panel-btn" data-panel="stats">&times;</button>
+                </div>
+                <div class="panel-content">
+                    <div class="class-display">
+                        <div class="class-icon" id="class-icon"></div>
+                        <span class="class-name" id="class-name">Warrior</span>
+                    </div>
+                    <div class="stats-list">
+                        <div class="stat-row"><span class="stat-icon hp-icon"></span><span class="stat-name">HP</span><span class="stat-val" id="stat-hp">100/100</span></div>
+                        <div class="stat-row"><span class="stat-icon atk-icon"></span><span class="stat-name">Attack</span><span class="stat-val" id="stat-attack">10</span></div>
+                        <div class="stat-row"><span class="stat-icon def-icon"></span><span class="stat-name">Defense</span><span class="stat-val" id="stat-defense">5</span></div>
+                        <div class="stat-row"><span class="stat-icon spd-icon"></span><span class="stat-name">Speed</span><span class="stat-val" id="stat-speed">1.00</span></div>
+                        <div class="stat-row"><span class="stat-icon eva-icon"></span><span class="stat-name">Evasion</span><span class="stat-val" id="stat-evasion">5%</span></div>
+                        <div class="stat-row"><span class="stat-icon crit-icon"></span><span class="stat-name">Crit %</span><span class="stat-val" id="stat-crit-chance">5%</span></div>
+                        <div class="stat-row"><span class="stat-icon critd-icon"></span><span class="stat-name">Crit DMG</span><span class="stat-val" id="stat-crit-damage">150%</span></div>
+                    </div>
+                    <div class="xp-section">
+                        <div class="xp-label">XP: <span id="xp-current">0</span>/<span id="xp-needed">50</span></div>
+                        <div class="xp-bar"><div class="xp-fill" id="xp-bar"></div></div>
+                    </div>
+                    <div class="status-effects-display">
+                        <h3>Status Effects</h3>
+                        <div class="status-icons" id="player-status-effects"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Left Panel - Skills -->
+            <div class="sliding-panel left-panel" id="skills-panel">
+                <div class="panel-header">
+                    <h2>Skills</h2>
+                    <button class="close-panel-btn" data-panel="skills">&times;</button>
+                </div>
+                <div class="panel-content">
+                    <div class="skills-section">
+                        <h3>Active Skills</h3>
+                        <div class="skills-grid" id="active-skills">
+                            <!-- Dynamically populated based on class -->
+                        </div>
+                    </div>
+                    <div class="skill-tree-section">
+                        <h3>Skill Tree</h3>
+                        <div class="skill-tree" id="skill-tree">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Equipment -->
+            <div class="sliding-panel right-panel" id="equipment-panel">
+                <div class="panel-header">
+                    <h2>Equipment</h2>
+                    <button class="close-panel-btn" data-panel="equipment">&times;</button>
+                </div>
+                <div class="panel-content">
+                    <div class="auto-loot-toggle">
+                        <span>Auto-equip better gear</span>
+                        <div class="toggle-switch" id="auto-loot-toggle"></div>
+                    </div>
+                    <div class="equipment-slots">
+                        <div class="equip-slot" data-slot="weapon">
+                            <span class="slot-label">Weapon</span>
+                            <div class="slot-item" id="slot-weapon">Empty</div>
+                        </div>
+                        <div class="equip-slot" data-slot="armor">
+                            <span class="slot-label">Armor</span>
+                            <div class="slot-item" id="slot-armor">Empty</div>
+                        </div>
+                        <div class="equip-slot" data-slot="accessory">
+                            <span class="slot-label">Accessory</span>
+                            <div class="slot-item" id="slot-accessory">Empty</div>
+                        </div>
+                    </div>
+                    <div class="inventory-section">
+                        <h3>Inventory</h3>
+                        <div class="inventory-actions">
+                            <button class="inv-action-btn" onclick="equipBestItems()" title="Auto-equip best items">⬆️ Equip Best</button>
+                            <button class="inv-action-btn" onclick="sellAllCommon()" title="Sell all common items">💰 Sell Common</button>
+                        </div>
+                        <div class="inventory-grid" id="inventory-grid">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Shop/Upgrades -->
+            <div class="sliding-panel right-panel" id="upgrades-panel">
+                <div class="panel-header">
+                    <h2>Soul Shop</h2>
+                    <button class="close-panel-btn" data-panel="upgrades">&times;</button>
+                </div>
+                <div class="panel-content">
+                    <div class="shop-tabs">
+                        <button class="shop-tab active" data-tab="stats">Stats</button>
+                        <button class="shop-tab" data-tab="items">Items</button>
+                        <button class="shop-tab" data-tab="pets">Pets</button>
+                        <button class="shop-tab" data-tab="relics">Relics</button>
+                        <button class="shop-tab" data-tab="synergies">Synergy</button>
+                        <button class="shop-tab" data-tab="challenges">Challenge</button>
+                        <button class="shop-tab" data-tab="prestige">Prestige</button>
+                        <button class="shop-tab" data-tab="ascension">Ascend</button>
+                    </div>
+                    <div class="shop-content" id="shop-stats">
+                        <div class="upgrade-list">
+                            <button class="upgrade-btn" data-upgrade="maxHp">
+                                <span class="upgrade-icon hp-icon"></span>
+                                <div class="upgrade-info"><span class="upgrade-name">Max HP</span><span class="upgrade-level">Lv.<span id="upgrade-maxHp-level">0</span></span></div>
+                                <span class="upgrade-cost"><span id="upgrade-maxHp-cost">10</span> SP</span>
+                            </button>
+                            <button class="upgrade-btn" data-upgrade="attack">
+                                <span class="upgrade-icon atk-icon"></span>
+                                <div class="upgrade-info"><span class="upgrade-name">Attack</span><span class="upgrade-level">Lv.<span id="upgrade-attack-level">0</span></span></div>
+                                <span class="upgrade-cost"><span id="upgrade-attack-cost">10</span> SP</span>
+                            </button>
+                            <button class="upgrade-btn" data-upgrade="defense">
+                                <span class="upgrade-icon def-icon"></span>
+                                <div class="upgrade-info"><span class="upgrade-name">Defense</span><span class="upgrade-level">Lv.<span id="upgrade-defense-level">0</span></span></div>
+                                <span class="upgrade-cost"><span id="upgrade-defense-cost">10</span> SP</span>
+                            </button>
+                            <button class="upgrade-btn" data-upgrade="speed">
+                                <span class="upgrade-icon spd-icon"></span>
+                                <div class="upgrade-info"><span class="upgrade-name">Speed</span><span class="upgrade-level">Lv.<span id="upgrade-speed-level">0</span></span></div>
+                                <span class="upgrade-cost"><span id="upgrade-speed-cost">15</span> SP</span>
+                            </button>
+                            <button class="upgrade-btn" data-upgrade="evasion">
+                                <span class="upgrade-icon eva-icon"></span>
+                                <div class="upgrade-info"><span class="upgrade-name">Evasion</span><span class="upgrade-level">Lv.<span id="upgrade-evasion-level">0</span></span></div>
+                                <span class="upgrade-cost"><span id="upgrade-evasion-cost">15</span> SP</span>
+                            </button>
+                            <button class="upgrade-btn" data-upgrade="critChance">
+                                <span class="upgrade-icon crit-icon"></span>
+                                <div class="upgrade-info"><span class="upgrade-name">Crit %</span><span class="upgrade-level">Lv.<span id="upgrade-critChance-level">0</span></span></div>
+                                <span class="upgrade-cost"><span id="upgrade-critChance-cost">20</span> SP</span>
+                            </button>
+                        </div>
+                        <div class="bulk-hint">Hold button to buy multiple</div>
+                    </div>
+                    <div class="shop-content hidden" id="shop-items">
+                        <div class="items-list">
+                            <button class="item-btn" data-item="lifeCrystal">
+                                <span class="item-icon life-crystal"></span>
+                                <div class="item-info"><span class="item-name">Life Crystal</span><span class="item-desc">+10% Max HP</span></div>
+                                <span class="item-cost">500 SP</span>
+                            </button>
+                            <button class="item-btn" data-item="warriorsBlade">
+                                <span class="item-icon warriors-blade"></span>
+                                <div class="item-info"><span class="item-name">Warrior's Blade</span><span class="item-desc">+15% Attack</span></div>
+                                <span class="item-cost">750 SP</span>
+                            </button>
+                            <button class="item-btn" data-item="guardianShield">
+                                <span class="item-icon guardian-shield"></span>
+                                <div class="item-info"><span class="item-name">Guardian Shield</span><span class="item-desc">+15% Defense</span></div>
+                                <span class="item-cost">750 SP</span>
+                            </button>
+                            <button class="item-btn" data-item="swiftBoots">
+                                <span class="item-icon swift-boots"></span>
+                                <div class="item-info"><span class="item-name">Swift Boots</span><span class="item-desc">+20% Speed</span></div>
+                                <span class="item-cost">1000 SP</span>
+                            </button>
+                            <button class="item-btn" data-item="shadowCloak">
+                                <span class="item-icon shadow-cloak"></span>
+                                <div class="item-info"><span class="item-name">Shadow Cloak</span><span class="item-desc">+10% Evasion</span></div>
+                                <span class="item-cost">1000 SP</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="shop-content hidden" id="shop-pets">
+                        <div class="pets-info">
+                            <p>Companions that follow and assist you!</p>
+                            <p class="active-pet-display">Active: <span id="active-pet-name">None</span></p>
+                        </div>
+                        <div class="pets-list" id="pets-list">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                    <div class="shop-content hidden" id="shop-prestige">
+                        <div class="prestige-info">
+                            <p>Prestige to gain permanent multipliers!</p>
+                            <p>Current Multiplier: <span id="prestige-mult">1.00</span>x</p>
+                            <p>Souls on Prestige: <span id="prestige-souls">0</span></p>
+                            <p>New Multiplier: <span id="prestige-new-mult">1.00</span>x</p>
+                        </div>
+                        <button class="prestige-btn" id="prestige-btn">PRESTIGE</button>
+                        <p class="prestige-warning">Resets: Floor, Level, Equipment, Run Stats</p>
+                        <p class="prestige-keep">Keeps: Soul Upgrades, Special Items, Achievements</p>
+                    </div>
+                    <div class="shop-content hidden" id="shop-relics">
+                        <div class="relics-info">
+                            <p>Equip relics for powerful passive bonuses!</p>
+                        </div>
+                        <div class="relics-list" id="relics-list">
+                            <p class="no-relics">No relics found yet. Complete challenges or reach milestones!</p>
+                        </div>
+                    </div>
+                    <div class="shop-content hidden" id="shop-synergies">
+                        <div class="synergies-info">
+                            <p>Synergies activate when conditions are met!</p>
+                        </div>
+                        <div class="synergies-list" id="synergies-list">
+                            <p class="no-synergies">No active synergies. Combine class, pet, and equipment for bonuses!</p>
+                        </div>
+                    </div>
+                    <div class="shop-content hidden" id="shop-challenges">
+                        <div class="challenges-info">
+                            <p>Complete challenges for Soul Points and Relics!</p>
+                        </div>
+                        <div class="challenges-list" id="challenges-list">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                    <div class="shop-content hidden" id="shop-ascension">
+                        <div class="ascension-header">
+                            <h3>Ascension</h3>
+                            <p>Reach new heights of power!</p>
+                        </div>
+                        <div class="ascension-info" id="ascension-info">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Achievements -->
+            <div class="sliding-panel right-panel" id="achievements-panel">
+                <div class="panel-header">
+                    <h2>Achievements</h2>
+                    <button class="close-panel-btn" data-panel="achievements">&times;</button>
+                </div>
+                <div class="panel-content">
+                    <div class="achievement-summary">
+                        <span>Unlocked: <span id="achievements-unlocked">0</span>/<span id="achievements-total">0</span></span>
+                    </div>
+                    <div class="achievements-list" id="achievements-list">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Settings -->
+            <div class="sliding-panel right-panel" id="settings-panel">
+                <div class="panel-header">
+                    <h2>Settings</h2>
+                    <button class="close-panel-btn" data-panel="settings">&times;</button>
+                </div>
+                <div class="panel-content">
+                    <div class="settings-section">
+                        <h3>Audio</h3>
+                        <div class="setting-row">
+                            <span>Music</span>
+                            <input type="range" id="music-volume" min="0" max="100" value="50">
+                        </div>
+                        <div class="setting-row">
+                            <span>Sound FX</span>
+                            <input type="range" id="sfx-volume" min="0" max="100" value="50">
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Display</h3>
+                        <div class="setting-row">
+                            <span>Show Damage Numbers</span>
+                            <input type="checkbox" id="show-damage" checked>
+                        </div>
+                        <div class="setting-row">
+                            <span>Show Combat Log</span>
+                            <input type="checkbox" id="show-log" checked>
+                        </div>
+                        <div class="setting-row">
+                            <span>Show Particles</span>
+                            <input type="checkbox" id="show-particles" checked>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Statistics Dashboard</h3>
+                        <div class="stats-dashboard" id="stats-dashboard">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Milestones</h3>
+                        <div class="milestones-list" id="milestones-list">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Save Data</h3>
+                        <div class="save-buttons">
+                            <button class="save-btn" id="export-save">Export Save</button>
+                            <button class="save-btn" id="import-save">Import Save</button>
+                            <button class="save-btn danger" id="reset-save">Reset All</button>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Keyboard Shortcuts</h3>
+                        <div class="shortcuts-list">
+                            <p><kbd>1-4</kbd> Use Skills</p>
+                            <p><kbd>Q</kbd> Stats | <kbd>W</kbd> Skills</p>
+                            <p><kbd>E</kbd> Equipment | <kbd>R</kbd> Shop</p>
+                            <p><kbd>Space</kbd> Toggle Speed</p>
+                        </div>
+                    </div>
+                    <div class="settings-section credits-section">
+                        <p class="game-credits">Made by ZombieCoco 🧟</p>
+                        <p class="game-version">Version 1.0.0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Panel - Combat Log -->
+            <div class="sliding-panel bottom-panel" id="log-panel">
+                <div class="panel-header">
+                    <h2>Combat Log</h2>
+                    <button class="close-panel-btn" data-panel="log">&times;</button>
+                </div>
+                <div class="panel-content">
+                    <div class="combat-log" id="combat-log"></div>
+                </div>
+            </div>
+
+            <!-- Grid Game Area -->
+            <div class="grid-container">
+                <div class="biome-indicator" id="biome-indicator">Dungeon Depths</div>
+                <div class="grid-wrapper">
+                    <canvas id="game-canvas"></canvas>
+                    <div class="floating-ui">
+                        <div class="entity-health player-health-float" id="player-health-float">
+                            <div class="health-bar-mini"><div class="health-fill-mini" id="player-health-bar"></div></div>
+                        </div>
+                    </div>
+                    <div class="damage-container" id="damage-container"></div>
+                </div>
+                <div class="floor-info-bar">
+                    <span class="objective-item" id="objective-chests" title="Collect all treasure">📦 <span id="chests-collected">0</span>/<span id="chests-total">0</span></span>
+                    <span class="objective-item" id="objective-monsters" title="Defeat all monsters">⚔️ <span id="monsters-remaining">0</span></span>
+                    <span id="floor-type" class="floor-type normal">Floor 1</span>
+                    <span class="objective-item" id="objective-exit" title="Find the exit">🚪 <span id="exit-status">Locked</span></span>
+                </div>
+                <button class="log-toggle-btn" id="log-toggle">Combat Log</button>
+            </div>
+        </div>
+
+        <!-- Class Selection Modal -->
+        <div class="modal" id="class-modal">
+            <div class="modal-content class-select">
+                <h2>Choose Your Class</h2>
+                <div class="class-options">
+                    <div class="class-option" data-class="warrior">
+                        <div class="class-portrait warrior-portrait"></div>
+                        <h3>Warrior</h3>
+                        <p>High HP & Defense</p>
+                        <p class="class-bonus">+20% HP, +15% DEF</p>
+                        <p class="class-skill">Skill: Whirlwind</p>
+                    </div>
+                    <div class="class-option" data-class="mage">
+                        <div class="class-portrait mage-portrait"></div>
+                        <h3>Mage</h3>
+                        <p>High Damage & Crit</p>
+                        <p class="class-bonus">+25% ATK, +10% CRIT</p>
+                        <p class="class-skill">Skill: Fireball</p>
+                    </div>
+                    <div class="class-option" data-class="rogue">
+                        <div class="class-portrait rogue-portrait"></div>
+                        <h3>Rogue</h3>
+                        <p>High Speed & Evasion</p>
+                        <p class="class-bonus">+30% SPD, +15% EVA</p>
+                        <p class="class-skill">Skill: Shadow Step</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Death Modal -->
+        <div class="modal" id="death-modal">
+            <div class="modal-content">
+                <h2>You Have Fallen!</h2>
+                <div class="death-stats">
+                    <p>Floor Reached: <span id="death-floor">1</span></p>
+                    <p>Level Reached: <span id="death-level">1</span></p>
+                    <p>Monsters Killed: <span id="death-kills">0</span></p>
+                    <p>Soul Points Earned: <span id="death-souls">0</span></p>
+                </div>
+                <div class="loot-drops" id="death-loot"></div>
+                <button class="restart-btn" id="restart-btn">Rise Again</button>
+            </div>
+        </div>
+
+        <!-- NPC Modal -->
+        <div class="modal" id="npc-modal">
+            <div class="modal-content npc-dialog">
+                <div class="npc-portrait" id="npc-portrait"></div>
+                <h2 id="npc-name">Merchant</h2>
+                <p id="npc-dialog">Welcome, adventurer!</p>
+                <div class="npc-options" id="npc-options"></div>
+                <button class="close-npc-btn" id="close-npc">Leave</button>
+            </div>
+        </div>
+
+        <!-- Chest Modal -->
+        <div class="modal" id="chest-modal">
+            <div class="modal-content chest-loot">
+                <h2>Treasure Found!</h2>
+                <div class="chest-contents" id="chest-contents"></div>
+                <button class="close-chest-btn" id="close-chest">Take All</button>
+            </div>
+        </div>
+
+        <!-- Room Event Modal -->
+        <div class="modal" id="room-event-modal">
+            <div class="modal-content room-event-dialog">
+                <h2 id="room-event-name">Ancient Shrine</h2>
+                <p class="room-event-desc" id="room-event-desc">Effect description</p>
+                <div class="room-event-buttons">
+                    <button class="room-event-btn activate" id="room-event-activate">Activate</button>
+                    <button class="room-event-btn skip" onclick="document.getElementById('room-event-modal').classList.remove('active')">Skip</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievement Popup -->
+        <div class="achievement-popup" id="achievement-popup">
+            <div class="achievement-icon"></div>
+            <div class="achievement-text">
+                <span class="achievement-title">Achievement Unlocked!</span>
+                <span class="achievement-name" id="achievement-popup-name"></span>
+            </div>
+        </div>
+
+        <!-- Import/Export Modal -->
+        <div class="modal" id="save-modal">
+            <div class="modal-content save-dialog">
+                <h2 id="save-modal-title">Export Save</h2>
+                <textarea id="save-textarea" readonly></textarea>
+                <div class="save-modal-buttons">
+                    <button id="copy-save">Copy</button>
+                    <button id="close-save-modal">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tutorial Modal -->
+        <div class="modal" id="tutorial-modal">
+            <div class="modal-content tutorial-dialog">
+                <h2 class="tutorial-title">Welcome!</h2>
+                <p class="tutorial-text">Tutorial text here</p>
+                <div class="tutorial-footer">
+                    <span class="tutorial-progress">1/8</span>
+                    <div class="tutorial-buttons">
+                        <button class="tutorial-skip-btn" onclick="skipTutorial()">Skip</button>
+                        <button class="tutorial-next-btn" onclick="nextTutorialStep()">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Offline Progress Modal -->
+        <div class="modal" id="offline-modal">
+            <div class="modal-content offline-dialog">
+                <h2>Welcome Back!</h2>
+                <p>You were away for <span class="offline-time">0</span></p>
+                <p class="offline-earnings">Earned: <span class="offline-souls">0</span> Soul Points</p>
+                <p class="offline-capped" style="display:none;color:#ffc107;">Max offline time is 8 hours</p>
+                <button class="claim-offline-btn" onclick="claimOfflineRewards()">Claim Rewards</button>
+            </div>
+        </div>
+
+        <!-- Daily Reward Modal -->
+        <div class="modal" id="daily-reward-modal">
+            <div class="modal-content daily-dialog">
+                <h2>Daily Reward Available!</h2>
+                <div id="daily-rewards"></div>
+                <button class="close-daily-btn" onclick="document.getElementById('daily-reward-modal').classList.remove('active')">Close</button>
+            </div>
+        </div>
+
+        <!-- Milestone Popup -->
+        <div class="milestone-popup" id="milestone-popup">
+            <div class="milestone-icon">&#9733;</div>
+            <div class="milestone-content">
+                <span class="milestone-label">Milestone Unlocked!</span>
+                <span class="milestone-text"></span>
+            </div>
+        </div>
+
+        <!-- Tooltip -->
+        <div class="game-tooltip" id="game-tooltip" style="display:none;"></div>
+
+        <!-- Mobile Bottom Bar -->
+        <div class="mobile-bottom-bar" id="mobile-bottom-bar">
+            <div class="mobile-skills-bar">
+                <button class="mobile-skill-btn" data-skill="heal" id="mobile-heal">
+                    <div class="skill-icon heal-skill">💚</div>
+                    <div class="cooldown-overlay" id="mobile-heal-cd"></div>
+                </button>
+                <button class="mobile-skill-btn" data-skill="dash" id="mobile-dash">
+                    <div class="skill-icon dash-skill">💨</div>
+                    <div class="cooldown-overlay" id="mobile-dash-cd"></div>
+                </button>
+                <button class="mobile-skill-btn" data-skill="whirlwind" id="mobile-whirlwind">
+                    <div class="skill-icon whirlwind-skill">🌀</div>
+                    <div class="cooldown-overlay" id="mobile-whirlwind-cd"></div>
+                </button>
+                <button class="mobile-skill-btn" data-skill="fireball" id="mobile-fireball">
+                    <div class="skill-icon fireball-skill">🔥</div>
+                    <div class="cooldown-overlay" id="mobile-fireball-cd"></div>
+                </button>
+                <button class="mobile-skill-btn speed-toggle" id="mobile-speed">
+                    <span class="speed-text">1x</span>
+                </button>
+            </div>
+            <div class="mobile-nav-bar">
+                <button class="mobile-nav-btn" data-panel="stats">
+                    <div class="nav-icon">📊</div>
+                    <span>Stats</span>
+                </button>
+                <button class="mobile-nav-btn" data-panel="skills">
+                    <div class="nav-icon">⚔️</div>
+                    <span>Skills</span>
+                </button>
+                <button class="mobile-nav-btn" data-panel="equipment">
+                    <div class="nav-icon">🛡️</div>
+                    <span>Equip</span>
+                </button>
+                <button class="mobile-nav-btn" data-panel="upgrades">
+                    <div class="nav-icon">🛒</div>
+                    <span>Shop</span>
+                </button>
+                <button class="mobile-nav-btn" data-panel="settings">
+                    <div class="nav-icon">⚙️</div>
+                    <span>More</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+<!--客服 开始-->
+<script src="//g8hh.github.io/static/js/jquery.min.js"></script>
+<link rel="stylesheet" href="//g8hh.github.io/static/css/kf.css" type="text/css" media="screen" charset="utf-8">
+<script src="//g8hh.github.io/static/js/kf.js"></script>
+<!-- 客服 结束 -->
+<!--站长统计--> 
+<div style="display: none">
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?028b1b5f659ed138230f4cafd7ad0dfc";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+    </div>
+</body>
+</html>
